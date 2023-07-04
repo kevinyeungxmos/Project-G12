@@ -12,6 +12,7 @@ import FirebaseStorage
 struct signUpView: View {
     
     @EnvironmentObject var authHelper: FireAuthController
+    @EnvironmentObject var dbHelper: FirestoreController
     @Binding var rootScreen: Int
     
     @State private var linkselection: Int? = nil
@@ -166,8 +167,9 @@ struct signUpView: View {
                                 //show to home screen
                                 uploadIcon()
                                 let newUser = UserInfo(firstName: self.firstName, lastName: self.lastName, email: self.email, iconUrl: "\(self.email)/\(self.email)_icon.jpg")
+                                dbHelper.insertUser(newUser: newUser)
                                 self.isError = false
-                                self.rootScreen = 3
+                                self.rootScreen = 2
                                 self.email = ""
                                 self.password = ""
                                 self.firstName = ""

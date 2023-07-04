@@ -13,7 +13,6 @@ import FirebaseFirestore
 
 @main
 struct Project_G03App: App {
-    let authHelper = FireAuthController()
     
     init(){
         FirebaseApp.configure()
@@ -21,7 +20,7 @@ struct Project_G03App: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(authHelper)
+            ContentView()
         }
     }
 }

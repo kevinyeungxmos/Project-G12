@@ -317,24 +317,24 @@ enum Status: String, Codable {
 
 // MARK: - Venue
 struct Venue: Codable {
-    let state: String
-    let nameV2, postalCode, name: String
-    let links: [JSONAny]
-    let timezone: String
-    let url: String
-    let score: Double
-    let location: Location
-    let address: String
-    let country: String
-    let hasUpcomingEvents: Bool
-    let numUpcomingEvents: Int
-    let city: String
-    let slug: String
-    let extendedAddress: String
-    let id, popularity: Int
+    let state: String?
+    let nameV2, postalCode, name: String?
+    let links: [JSONAny]?
+    let timezone: String?
+    let url: String?
+    let score: Double?
+    let location: Location?
+    let address: String?
+    let country: String?
+    let hasUpcomingEvents: Bool?
+    let numUpcomingEvents: Int?
+    let city: String?
+    let slug: String?
+    let extendedAddress: String?
+    let id, popularity: Int?
     let accessMethod: AccessMethod?
-    let metroCode, capacity: Int
-    let displayLocation: String
+    let metroCode, capacity: Int?
+    let displayLocation: String?
 
     enum CodingKeys: String, CodingKey {
         case state
@@ -357,7 +357,7 @@ struct Venue: Codable {
 // MARK: - Meta
 struct Meta: Codable {
     let total, took, page, perPage: Int
-    let geolocation: Geolocation
+    let geolocation: Geolocation?
 
     enum CodingKeys: String, CodingKey {
         case total, took, page

@@ -21,6 +21,13 @@ class FireAuthController : ObservableObject{
     
     @Published var isLoginSuccessful = false
     
+    init(){
+        //do a auth clean up when start
+        if let currentUser = Auth.auth().currentUser{
+            self.signOut()
+        }
+    }
+    
     func listenToAuthState(){
         Auth.auth().addStateDidChangeListener{ [weak self] _, user in
             guard let self = self else{
@@ -85,18 +92,6 @@ class FireAuthController : ObservableObject{
             guard let result = authResult else{
                 print(#function, "Error while signing in user : \(error)")
                 
-//                if let err = error{
-//                    let e = err as NSError
-//                    switch e.code{
-//                    case AuthErrorCode.wrongPassword.rawValue:
-//                        print("invalid email or password")
-//                    case AuthErrorCode.invalidEmail.rawValue:
-//                        print("invalid email or password")
-//                    default:
-//                        print(e.localizedDescription)
-//                    }
-//                }
-                
                 DispatchQueue.main.async {
                     self.isLoginSuccessful = false
                     let e = error as? NSError
@@ -128,11 +123,6 @@ class FireAuthController : ObservableObject{
                 //save the email in the UserDefaults
                 UserDefaults.standard.set(self.user?.email, forKey: "KEY_EMAIL")
                 
-                print(#function, "user email : \(self.user?.email)")
-                print(#function, "user displayName : \(self.user?.displayName)")
-                print(#function, "user isEmailVerified : \(self.user?.isEmailVerified)")
-                print(#function, "user phoneNumber : \(self.user?.phoneNumber)")
-                
                 DispatchQueue.main.async {
                     self.isLoginSuccessful = true
                     self.errM = ""
@@ -146,6 +136,7 @@ class FireAuthController : ObservableObject{
     func signOut(){
         do{
             try Auth.auth().signOut()
+            print("Logout Successfully", Auth.auth().currentUser?.email)
             UserDefaults.standard.removeObject(forKey: "KEY_EMAIL")
         }catch let err as NSError{
             print(#function, "Unable to sign out : \(err)")

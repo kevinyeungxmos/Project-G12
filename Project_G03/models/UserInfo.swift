@@ -6,12 +6,16 @@
 //
 
 import Foundation
+import FirebaseFirestoreSwift
 
-class UserInfo{
+struct UserInfo: Codable, Hashable{
+    
+    @DocumentID var id: String? = UUID().uuidString
     var firstName: String
     var lastName: String
     var email: String
     var iconUrl: String
+    var eventAttended: Int = 0
     
     init(firstName: String, lastName: String, email: String, iconUrl: String) {
         self.firstName = firstName

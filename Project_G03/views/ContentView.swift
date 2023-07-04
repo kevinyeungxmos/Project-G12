@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var authHelper: FireAuthController
+    private var authHelper = FireAuthController()
+    private var dbHelper = FirestoreController.getInstance()
     @State private var root: RootView = .SignIn
     @State private var selectedTabIndex = 0
+    
     
     var body: some View {
         NavigationView{
@@ -21,23 +23,34 @@ struct ContentView: View {
                     .tabItem{
                         Label("Login", systemImage: "house")
                     }
-                signUpView(rootScreen: $selectedTabIndex).environmentObject(authHelper)
+                signUpView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
                     .tag(1)
                     .tabItem{
                         Label("SignUP", systemImage: "network")
                     }
-                listOfEventView(rootScreen: $selectedTabIndex).environmentObject(authHelper)
+                listOfEventView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
                     .tag(2)
                     .tabItem{
                         Label("Find Event", systemImage: "list.dash")
                     }
-                eventDetailsView(rootScreen: $selectedTabIndex).environmentObject(authHelper)
-                    .tag(3)
+//                eventDetailsView(rootScreen: $selectedTabIndex, event: $eventDetails).environmentObject(authHelper).environmentObject(dbHelper)
+//                    .tag(3)
+//                    .tabItem{
+//                        Label("Detail", systemImage: "folder")
+//                    }
+                myEventView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
+                    .tag(4)
                     .tabItem{
-                        Label("Detail", systemImage: "folder")
+                        Label("My Event", systemImage: "folder")
                     }
             }
-            
+            .toolbar{
+                if (selectedTabIndex == 2 || selectedTabIndex == 3 || selectedTabIndex == 4){
+                    if let _ = UserDefaults.standard.string(forKey: "KEY_EMAIL"){
+                        LogoutView(rootScreen: $selectedTabIndex).environmentObject(authHelper)
+                    }
+                }
+            }
 //            switch root{
 //            case .SignIn:
 //                selectedTabIndex = 0

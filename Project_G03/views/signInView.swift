@@ -81,11 +81,7 @@ struct signInView: View {
                     }
                     
                 }.padding(.bottom, 20)
-//                Toggle(isOn: self.$isRemember){
-//                    Text("Remember Me")
-//                        .foregroundColor(.black)
-//                }.toggleStyle(Checkboxstyle())
-//                    .padding(.bottom, 20)
+
                 Button(action: {
                     print("username: \(self.email)")
                     print("password: \(self.password)")
