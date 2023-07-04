@@ -11,6 +11,7 @@ import FirebaseFirestore
 class FirestoreController : ObservableObject{
     
     @Published var myEventList = [EventInfo]()
+    @Published var searchList = [UserInfo]()
     
     private let db : Firestore
     private static var shared : FirestoreController?
@@ -34,6 +35,36 @@ class FirestoreController : ObservableObject{
         }
         
         return self.shared!
+    }
+    
+    func searchFriend(nameOrEmail:String){
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        searchList.removeAll()
+        if self.loggedInUserEmail.isEmpty{
+            print("user's email address not available")
+        }else{
+            do{
+                try self.db.collection(COLLECTION).getDocuments(){
+                    (querySnapshot, err) in
+                    if let err = err{
+                        print("Error getting document: \(err)")
+                    }else{
+                        for document in querySnapshot!.documents{
+                            let userInfo = try? document.data(as: UserInfo.self)
+                            if let ui = userInfo{
+                                if ui.firstName.contains(nameOrEmail){
+                                    if ui.email != self.loggedInUserEmail{
+                                        self.searchList.append(ui)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }catch{
+                print("Cannot retrieve user info from db: \(error)")
+            }
+        }
     }
     
     func insertUser(newUser: UserInfo){
@@ -102,6 +133,9 @@ class FirestoreController : ObservableObject{
     }
     
     func removeEvent(eventToRemove: EventInfo){
+        
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        
         guard let id = eventToRemove.id  else{
             print("Cannot remove event")
             return
@@ -147,84 +181,8 @@ class FirestoreController : ObservableObject{
                     }
                 }
             }
-//            do{
-//                self.db.collection(COLLECTION).document(self.loggedInUserEmail).getDocument{doc,err in
-//                    if let dd = doc{
-//                        var dChange = try dd.data(as: UserInfo.self)
-//                    }
-//                }
-//            }catch let err as NSError{
-//                print("Unable to update user info: \(err)")
-//            }
-            
         }
     }
-
-    //    func deleteEmployee(empToDelete : Employee){
-    //        print(#function, "Deleting employee \(empToDelete.empName)")
-    //
-    //
-    //        //get the email address of currently logged in user
-    //        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
-    //
-    //        if (self.loggedInUserEmail.isEmpty){
-    //            print(#function, "Logged in user's email address not available. Can't delete employees")
-    //        }
-    //        else{
-    //            do{
-    //                try self.db
-    //                    .collection(COLLECTION_RECRUITER_EMPLOYEES)
-    //                    .document(self.loggedInUserEmail)
-    //                    .collection(COLLECTION_EMP)
-    //                    .document(empToDelete.id!)
-    //                    .delete{ error in
-    //                        if let err = error {
-    //                            print(#function, "Unable to delete employee from database : \(err)")
-    //                        }else{
-    //                            print(#function, "Employee \(empToDelete.empName) successfully deleted from database")
-    //                        }
-    //                    }
-    //            }catch let err as NSError{
-    //                print(#function, "Unable to delete employee from database : \(err)")
-    //            }
-    //        }
-    //    }
-    //
-    //
-    //
-    //    func updateEmployee(empToUpdate : Employee){
-    //        print(#function, "Updating employee \(empToUpdate.empName), ID : \(empToUpdate.id)")
-    //
-    //
-    //        //get the email address of currently logged in user
-    //        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
-    //
-    //        if (self.loggedInUserEmail.isEmpty){
-    //            print(#function, "Logged in user's email address not available. Can't update employees")
-    //        }
-    //        else{
-    //            do{
-    //                try self.db
-    //                    .collection(COLLECTION_RECRUITER_EMPLOYEES)
-    //                    .document(self.loggedInUserEmail)
-    //                    .collection(COLLECTION_EMP)
-    //                    .document(empToUpdate.id!)
-    //                    .updateData([FIELD_EMPNAME : empToUpdate.empName,
-    //                                    FIELD_ROLE : empToUpdate.isManager,
-    //                                FIELD_MGR_NAME : empToUpdate.managerName,
-    //                           FIELD_CONTRIBUTIONS : empToUpdate.empContributions]){ error in
-    //
-    //                        if let err = error {
-    //                            print(#function, "Unable to update employee in database : \(err)")
-    //                        }else{
-    //                            print(#function, "Employee \(empToUpdate.empName) successfully updated in database")
-    //                        }
-    //                    }
-    //            }catch let err as NSError{
-    //                print(#function, "Unable to update employee in database : \(err)")
-    //            }
-    //        }
-    //    }
     
     func getMyEvent(email: String){
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
@@ -278,98 +236,5 @@ class FirestoreController : ObservableObject{
             }
         }
     }
-    //
-    //    func getAllEmployees(){
-    //        print(#function, "Trying to get all employees.")
-    //
-    //
-    //        //get the email address of currently logged in user
-    //        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
-    //
-    ////        get the instance of Auth Helper to access all the user details
-    ////        self.loggedInUserEmail = self.authHelper.user.email
-    //
-    //        if (self.loggedInUserEmail.isEmpty){
-    //            print(#function, "Logged in user's email address not available. Can't show employees")
-    //        }
-    //        else{
-    //            do{
-    //
-    //                self.db
-    //                    .collection(COLLECTION_RECRUITER_EMPLOYEES)
-    //                    .document(self.loggedInUserEmail)
-    //                    .collection(COLLECTION_EMP)
-    //                    .addSnapshotListener({ (querySnapshot, error) in
-    //
-    //                        guard let snapshot = querySnapshot else{
-    //                            print(#function, "Unable to retrieve data from database : \(error)")
-    //                            return
-    //                        }
-    //
-    //                        snapshot.documentChanges.forEach{ (docChange) in
-    //
-    //                            do{
-    //                                //convert JSON document to swift object
-    //                                var emp : Employee = try docChange.document.data(as: Employee.self)
-    //
-    //                                //get the document id so that it can be used for updating and deleting document
-    //                                var documentID = docChange.document.documentID
-    //
-    //                                //set the firestore document id to the converted object
-    //                                emp.id = documentID
-    //
-    //                                print(#function, "Document ID : \(documentID)")
-    //
-    //                                //if new document added, perform required operations
-    //                                if docChange.type == .added{
-    //                                    self.empList.append(emp)
-    //                                    print(#function, "New document added : \(emp.empName)")
-    //                                }
-    //
-    //                                //get the index of any matching object in the local list for the firestore document that has been deleted or updated
-    //                                let matchedIndex = self.empList.firstIndex(where: { ($0.id?.elementsEqual(documentID))! })
-    //
-    //                                //if a document deleted, perform required operations
-    //                                if docChange.type == .removed{
-    //                                    print(#function, " document removed : \(emp.empName)")
-    //
-    //                                    //remove the object for deleted document from local list
-    //                                    if (matchedIndex != nil){
-    //                                        self.empList.remove(at: matchedIndex!)
-    //                                    }
-    //                                }
-    //
-    //                                //if a document updated, perform required operations
-    //                                if docChange.type == .modified{
-    //                                    print(#function, " document updated : \(emp.empName)")
-    //
-    //                                    //update the existing object in local list for updated document
-    //                                    if (matchedIndex != nil){
-    //                                        self.empList[matchedIndex!] = emp
-    //                                    }
-    //                                }
-    //
-    //                            }catch let err as NSError{
-    //                                print(#function, "Unable to convert the JSON doc into Swift Object : \(err)")
-    //                            }
-    //
-    //                        }//ForEach
-    //
-    //                    })//addSnapshotListener
-    //
-    //            }catch let err as NSError{
-    //                print(#function, "Unable to get all employee from database : \(err)")
-    //            }//do..catch
-    //        }//else
-    //    }
-    //
-    //
-    //    func createUserProfile(){
-    //
-    //    }
-    //
-    //    func updateUserProfile(){
-    //
-    //    }
     
 }

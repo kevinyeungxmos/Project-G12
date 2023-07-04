@@ -181,36 +181,7 @@ struct listOfEventView: View {
                                         Text("\(event.title) City: \(event.city)")
                                     }
                                 }
-//                                Button(action: {
-//                                    eventToDetail = event
-//                                    rootScreen = 3
-//                                }){
-//                                    VStack(alignment: .center){
-//                                        AsyncImage(url: URL(string: event.img)){
-//                                            phase in
-//                                            switch phase{
-//                                            case .empty:
-//                                                ProgressView()
-//                                            case .success(let image):
-//                                                HStack{
-//                                                    Spacer()
-//                                                    image.resizable()
-//                                                        .scaledToFill()
-//                                                        .frame(width: 200, height: 100)
-//                                                        .padding()
-//                                                    Spacer()
-//                                                }
-//                                            case .failure:
-//                                                Image(systemName: "photo")
-//                                            default:
-//                                                EmptyView()
-//                                            }
-//                                        }
-//                                        Text("\(event.title) City: \(event.city)")
-//                                    }
-//                                }
-                                
-                            }.onDelete(perform: removeEvent)
+                            }
                         }
                         
                     }
@@ -249,36 +220,7 @@ struct listOfEventView: View {
                                     }
                                 }
                                 
-//                                Button(action: {
-//                                    eventToDetail = event
-//                                    rootScreen = 3
-//                                }){
-//                                    VStack(alignment: .center){
-//                                        AsyncImage(url: URL(string: event.img)){
-//                                            phase in
-//                                            switch phase{
-//                                            case .empty:
-//                                                ProgressView()
-//                                            case .success(let image):
-//                                                HStack{
-//                                                    Spacer()
-//                                                    image.resizable()
-//                                                        .scaledToFill()
-//                                                        .frame(width: 200, height: 100)
-//                                                        .padding()
-//                                                    Spacer()
-//                                                }
-//                                            case .failure:
-//                                                Image(systemName: "photo")
-//                                            default:
-//                                                EmptyView()
-//                                            }
-//                                        }
-//                                        Text("\(event.title) City: \(event.city)")
-//                                    }
-//                                }
-                                
-                            }.onDelete(perform: removeEvent)
+                            }
                         }
                         
                     }

@@ -43,6 +43,11 @@ struct ContentView: View {
                     .tabItem{
                         Label("My Event", systemImage: "folder")
                     }
+                searchFriend(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
+                    .tag(5)
+                    .tabItem{
+                        Label("Search Friend", systemImage: "magnifyingglass")
+                    }
             }
             .toolbar{
                 if (selectedTabIndex == 2 || selectedTabIndex == 3 || selectedTabIndex == 4){
