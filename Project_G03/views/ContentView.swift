@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     private var authHelper = FireAuthController()
+    private var storageHelper = FirebaseStorageController()
     private var dbHelper = FirestoreController.getInstance()
     @State private var root: RootView = .SignIn
     @State private var selectedTabIndex = 0
@@ -23,7 +24,7 @@ struct ContentView: View {
                     .tabItem{
                         Label("Login", systemImage: "house")
                     }
-                signUpView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
+                signUpView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper).environmentObject(storageHelper)
                     .tag(1)
                     .tabItem{
                         Label("SignUP", systemImage: "network")
@@ -43,10 +44,15 @@ struct ContentView: View {
                     .tabItem{
                         Label("My Event", systemImage: "folder")
                     }
-                searchFriend(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper)
+                searchFriend(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper).environmentObject(storageHelper)
                     .tag(5)
                     .tabItem{
                         Label("Search Friend", systemImage: "magnifyingglass")
+                    }
+                MyFriendListView(rootScreen: $selectedTabIndex).environmentObject(authHelper).environmentObject(dbHelper).environmentObject(storageHelper)
+                    .tag(6)
+                    .tabItem{
+                        Label("My Friend", systemImage: "person.circle")
                     }
             }
             .toolbar{

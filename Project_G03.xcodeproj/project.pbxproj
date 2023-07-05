@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7B14EF792A54058700ED7D94 /* showUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B14EF782A54058700ED7D94 /* showUserView.swift */; };
 		7B22E5212A512C03008531FD /* EventInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B22E5202A512C03008531FD /* EventInfo.swift */; };
+		7B437FE92A54A4BB00EE4810 /* FirebaseStorageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B437FE82A54A4BB00EE4810 /* FirebaseStorageController.swift */; };
+		7B437FEB2A54FA6F00EE4810 /* MyFriendListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B437FEA2A54FA6F00EE4810 /* MyFriendListView.swift */; };
 		7B6E27B52A53624700069D4C /* logoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6E27B42A53624700069D4C /* logoutView.swift */; };
 		7B6E27BA2A53890800069D4C /* MapMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6E27B92A53890800069D4C /* MapMarker.swift */; };
 		7B6E27BC2A53ED9C00069D4C /* searchFriend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6E27BB2A53ED9C00069D4C /* searchFriend.swift */; };
@@ -41,6 +43,8 @@
 /* Begin PBXFileReference section */
 		7B14EF782A54058700ED7D94 /* showUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = showUserView.swift; sourceTree = "<group>"; };
 		7B22E5202A512C03008531FD /* EventInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInfo.swift; sourceTree = "<group>"; };
+		7B437FE82A54A4BB00EE4810 /* FirebaseStorageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageController.swift; sourceTree = "<group>"; };
+		7B437FEA2A54FA6F00EE4810 /* MyFriendListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyFriendListView.swift; sourceTree = "<group>"; };
 		7B6E27B42A53624700069D4C /* logoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logoutView.swift; sourceTree = "<group>"; };
 		7B6E27B92A53890800069D4C /* MapMarker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMarker.swift; sourceTree = "<group>"; };
 		7B6E27BB2A53ED9C00069D4C /* searchFriend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchFriend.swift; sourceTree = "<group>"; };
@@ -134,6 +138,7 @@
 				7B6E27B42A53624700069D4C /* logoutView.swift */,
 				7B6E27BB2A53ED9C00069D4C /* searchFriend.swift */,
 				7B14EF782A54058700ED7D94 /* showUserView.swift */,
+				7B437FEA2A54FA6F00EE4810 /* MyFriendListView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -144,6 +149,7 @@
 				7BB3FCD52A4F60650007971A /* FireAuthController.swift */,
 				7BB3FCF62A4FFFD40007971A /* LocationManager.swift */,
 				7BCA99A22A50EBBC000B7BD5 /* FireStoreController.swift */,
+				7B437FE82A54A4BB00EE4810 /* FirebaseStorageController.swift */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -254,7 +260,9 @@
 				7BB3FCE52A4F81F80007971A /* checkboxstyle.swift in Sources */,
 				7BB3FCF52A4FF0040007971A /* Event.swift in Sources */,
 				7BB3FCBD2A4F59F70007971A /* ContentView.swift in Sources */,
+				7B437FE92A54A4BB00EE4810 /* FirebaseStorageController.swift in Sources */,
 				7BE0A6F52A515BC100CAFE73 /* myEventView.swift in Sources */,
+				7B437FEB2A54FA6F00EE4810 /* MyFriendListView.swift in Sources */,
 				7BB3FCDE2A4F62C90007971A /* listOfEventView.swift in Sources */,
 				7BB3FCDA2A4F62A40007971A /* signUpView.swift in Sources */,
 				7BB3FCD62A4F60650007971A /* FireAuthController.swift in Sources */,

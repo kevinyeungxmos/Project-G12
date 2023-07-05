@@ -15,6 +15,7 @@ struct eventDetailsView: View {
     @EnvironmentObject var dbHelper: FirestoreController
     @Binding var rootScreen: Int
     var event: EventInfo?
+    var addButton = true
     @State var markerLocation: [MMarker] = []
     @State var region: MKCoordinateRegion = MKCoordinateRegion()
     @StateObject var locationManager = LocationManager()
@@ -64,35 +65,65 @@ struct eventDetailsView: View {
                 MapMarker(coordinate: lo.coordinate)
             }
             
-            Button(action: {
-                if let userEmail = Auth.auth().currentUser{
-                    print("Already signed in")
-                    print("\(Auth.auth().currentUser?.email)")
-                    if userEmail.email == UserDefaults.standard.string(forKey: "KEY_EMAIL"){
-                        print("match with the userdefault")
-                        dbHelper.insertEventtoUserEventList(email: userEmail.email!, event: event!)
-                        
-                    }else{
-                        print("userdefault: \(UserDefaults.standard.string(forKey: "KEY_EMAIL"))")
-                        print("No Authentication. Cannot add Event Please Sign In!")
-                    }
-                }else{
-                    print("Please Login")
-                }
-            }){
-                Text("Add")
-            }
+//            Button(action: {
+//                if let userEmail = Auth.auth().currentUser{
+//                    print("Already signed in")
+//                    print("\(Auth.auth().currentUser?.email)")
+//                    if userEmail.email == UserDefaults.standard.string(forKey: "KEY_EMAIL"){
+//                        print("match with the userdefault")
+//                        dbHelper.insertEventtoUserEventList(email: userEmail.email!, event: event!)
+//                        
+//                    }else{
+//                        print("userdefault: \(UserDefaults.standard.string(forKey: "KEY_EMAIL"))")
+//                        print("No Authentication. Cannot add Event Please Sign In!")
+//                    }
+//                }else{
+//                    print("Please Login")
+//                }
+//            }){
+//                Text("Add")
+//            }
         }.onAppear{
             markerLocation = [MMarker(coordinate: CLLocationCoordinate2D(latitude: Double(event!.lat)! , longitude: Double(event!.lon)!), show: false)]
             region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Double(event!.lat)!, longitude: Double(event!.lon)!), span: MKCoordinateSpan(latitudeDelta: 0.4, longitudeDelta: 0.4))
-//            locationManager.locationManager.requestLocation()
-//            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: (locationManager.loca?.coordinate.latitude)!, longitude:(locationManager.loca?.coordinate.longitude)!), span: MKCoordinateSpan(latitudeDelta: 0.7, longitudeDelta: 0.7))
-        }
-//        .onChange(of: locationManager.loca){
-//            newLocation in
-//            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Double(event!.lat)!, longitude: Double(event!.lon)!), span: MKCoordinateSpan(latitudeDelta: 0.7, longitudeDelta: 0.7))
-//        }
+        }.overlay(alignment: .bottom, content: {
+            if addButton{
+                addEventButton
+            }
+        })
         
+        
+    }
+    
+    private var addEventButton : some View{
+        Button{
+            if let userEmail = Auth.auth().currentUser{
+                print("Already signed in")
+                print("\(Auth.auth().currentUser?.email)")
+                if userEmail.email == UserDefaults.standard.string(forKey: "KEY_EMAIL"){
+                    print("match with the userdefault")
+                    dbHelper.insertEventtoUserEventList(email: userEmail.email!, event: event!)
+                    
+                }else{
+                    print("userdefault: \(UserDefaults.standard.string(forKey: "KEY_EMAIL"))")
+                    print("No Authentication. Cannot add Event Please Sign In!")
+                }
+            }else{
+                print("Please Login")
+            }
+
+        }label: {
+            HStack{
+                Spacer()
+                Text("+ Add Event").font(.system(size: 16, weight: .bold))
+                Spacer()
+            }.foregroundColor(.white)
+                .padding(.vertical)
+                .background(.blue)
+                .cornerRadius(32)
+                .padding(.horizontal)
+                .shadow(radius: 5)
+        }
     }
 }
 

@@ -22,6 +22,7 @@ struct EventInfo: Codable, Hashable{
     var lon: String
     var price: String
     var url: String
+    var friendAlsoAttend = [UserInfo]()
     
     init(id: Int? = nil, title: String, performer: String, date: String, img: String, venue: String, address: String, city: String, lat: String, lon: String, price: String, url: String) {
         self.id = id

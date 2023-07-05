@@ -12,6 +12,9 @@ class FirestoreController : ObservableObject{
     
     @Published var myEventList = [EventInfo]()
     @Published var searchList = [UserInfo]()
+    @Published var friendEventList = [EventInfo]()
+    @Published var myFriendList = [UserInfo]()
+
     
     private let db : Firestore
     private static var shared : FirestoreController?
@@ -20,6 +23,7 @@ class FirestoreController : ObservableObject{
     private let COLLECTION = "User"
     private let SUBCOLLECTION = "UserInfo"
     private let USER_EVENT = "UserEvent"
+    private let FRIEND_LIST = "FriendList"
     
     private var loggedInUserEmail : String = ""
     private var firestoreListener: ListenerRegistration?
@@ -39,7 +43,7 @@ class FirestoreController : ObservableObject{
     
     func searchFriend(nameOrEmail:String){
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
-        searchList.removeAll()
+        self.searchList.removeAll()
         if self.loggedInUserEmail.isEmpty{
             print("user's email address not available")
         }else{
@@ -117,7 +121,7 @@ class FirestoreController : ObservableObject{
                         .updateData(["eventAttended" : userI.eventAttended]){
                             error in
                             if let e = error{
-                                print("Unable to update user Information")
+                                print("Unable to update user Information: \(e)")
                             }else{
                                 print("Update successfully")
                             }
@@ -136,7 +140,7 @@ class FirestoreController : ObservableObject{
         
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
         
-        guard let id = eventToRemove.id  else{
+        guard eventToRemove.id != nil  else{
             print("Cannot remove event")
             return
         }
@@ -170,7 +174,7 @@ class FirestoreController : ObservableObject{
                             .updateData(["eventAttended" : dChange.eventAttended]){
                                 error in
                                 if let e = error{
-                                    print("Unable to update user Information")
+                                    print("Unable to update user Information: \(e)")
                                 }else{
                                     print("Update successfully")
                                 }
@@ -184,6 +188,64 @@ class FirestoreController : ObservableObject{
         }
     }
     
+    func removeAllEvent(){
+        
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        
+        if self.loggedInUserEmail.isEmpty{
+            print("user's email address not available")
+        }
+        else{
+            //remove all event
+            
+            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(USER_EVENT)
+                .getDocuments(){ [self]
+                    querySnapshort, err in
+                    if let err = err{
+                        print("Error getting documents: \(err)")
+                    } else {
+                        for doc in querySnapshort!.documents{
+                            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(USER_EVENT)
+                                .document(doc.documentID).delete(){
+                                    err in
+                                    if let err = err {
+                                        print("Error removing document: \(err)")
+                                    } else {
+                                        print("Document successfully removed")
+                                    }
+                                }
+                        }
+                    }
+                }
+                          
+            //update the amount of event attended by user
+            let docRef = self.db.collection(COLLECTION).document(self.loggedInUserEmail)
+            docRef.getDocument {(document, error) in
+                if let document = document, document.exists {
+                    do{
+                        var dChange: UserInfo = try document.data(as: UserInfo.self)
+                        dChange.eventAttended = 0
+                        
+                        self.db
+                            .collection(self.COLLECTION)
+                            .document(self.loggedInUserEmail)
+                            .updateData(["eventAttended" : dChange.eventAttended]){
+                                error in
+                                if let e = error{
+                                    print("Unable to update user Information: \(e)")
+                                }else{
+                                    print("Update successfully")
+                                }
+                            }
+
+                    }catch let err as NSError{
+                        print("Cannot convert json to swift model: \(err)")
+                    }
+                }
+            }
+        }
+    }
+
     func getMyEvent(email: String){
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
         myEventList.removeAll()
@@ -236,5 +298,186 @@ class FirestoreController : ObservableObject{
             }
         }
     }
+    
+    func addToFriendList(friendEmail: String){
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        
+        if (friendEmail.isEmpty && self.loggedInUserEmail.isEmpty){
+            print("invalid user, please login")
+        }
+        else{
+            do{
+                try self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST)
+                    .document(friendEmail).setData(["email":friendEmail])
+                print("friend added")
+            }catch{
+                print("Error addin to frient list: \(error)")
+            }
+        }
+    }
+    
+    func deleteFriend(friendToDelete: UserInfo){
+        
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        
+        guard friendToDelete.id != nil  else{
+            print("Cannot remove event")
+            return
+        }
+        if self.loggedInUserEmail.isEmpty{
+            print("user's email address not available")
+        }
+        else{
+            //delete friend
+            
+            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST)
+                .document(friendToDelete.email).delete{
+                    error in
+                    if let e = error{
+                        print("Unable to delete friend: \(String(describing: e))")
+                    }else{
+                        print("Delete friend successfully")
+                        self.getMyFriendList()
+                    }
+                }
+            
+        }
+    }
+    
+    func deleteAllFriends(){
+        
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        
+        if self.loggedInUserEmail.isEmpty{
+            print("user's email address not available")
+        }
+        else{
+            //delete all friend
+            
+            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST)
+                .getDocuments(){ [self]
+                    querySnapshort, err in
+                    if let err = err{
+                        print("Error getting documents: \(err)")
+                    } else {
+                        for doc in querySnapshort!.documents{
+                            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST)
+                                .document(doc.documentID).delete(){
+                                    err in
+                                    if let err = err {
+                                        print("Error deleting document: \(err)")
+                                    } else {
+                                        print("Document successfully deleted")
+                                        self.getMyFriendList()
+                                    }
+                                }
+                        }
+                    }
+                }
+        }
+    }
+    
+    func getMyFriendList(){
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        self.myFriendList.removeAll()
+        if (self.loggedInUserEmail.isEmpty){
+            print("invalid user, please login")
+        }
+        else{
+            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST).getDocuments(){
+                docs, err in
+                if let err = err{
+                    print("Error getting documents: \(err)")
+                }
+                else{
+                    for doc in docs!.documents{
+                        print("your friend: \(doc.documentID)")
+                        self.db.collection(self.COLLECTION).document(doc.documentID).getDocument(){querySnapshort,error in
+                            if let err = error{
+                                print("Error of getting friend details")
+                            }
+                            else{
+                                let temp = try? querySnapshort!.data(as: UserInfo.self)
+                                print("Friend name \(String(describing: temp?.firstName)) \(String(describing: temp?.lastName))")
+                                self.myFriendList.append(temp!)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func getFriendEvent(email: String) {
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+        friendEventList.removeAll()
+//        myFriendList.removeAll()
+//        self.getMyFriendList()
+        
+        if (email.isEmpty && self.loggedInUserEmail.isEmpty){
+            print("Cannot show user's events, please login")
+        }
+        else{
+            self.db.collection(COLLECTION).document(email).collection(USER_EVENT).getDocuments(){
+                docs, err in
+                if let err = err{
+                    print("Error getting documents: \(err)")
+                }else{
+                    for doc in docs!.documents{
+                        var temp = try? doc.data(as: EventInfo.self)
+                        if temp != nil{
+                            self.friendEventList.append(temp!)
+                        }
+                        print("read friend event from db successfully \(self.friendEventList.count)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func getAnothertFriendEvent(email: String) -> [EventInfo] {
+        self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
+//        friendEventList.removeAll()
+        
+        var returnEvent = [EventInfo]()
+        
+        var bb : [[String: EventInfo?]] = []
+        
+        if (email.isEmpty && self.loggedInUserEmail.isEmpty){
+            print("Cannot show user's events, please login")
+        }
+        else{
+            self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST).getDocuments(){
+                querySnapshot, error in
+                if let err = error{
+                    print("Error getting documents: \(err)")
+                }else{
+                    for em in querySnapshot!.documents{
+                        if email != em.documentID{
+                            self.db.collection(self.COLLECTION).document(em.documentID).collection(self.USER_EVENT).getDocuments(){
+                                docs, err in
+                                if let err = err{
+                                    print("Error getting documents: \(err)")
+                                }else{
+                                    for doca in docs!.documents{
+                                        let temp = try? doca.data(as: EventInfo.self)
+                                        for docf in self.friendEventList{
+                                            if temp?.id == docf.id{
+                                                bb.append([em.documentID: temp])
+                                            }
+                                        }
+                                        print("read another friend event from db successfully \(returnEvent.count)")
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        return returnEvent
+    }
+    
     
 }

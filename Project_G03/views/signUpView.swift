@@ -13,6 +13,7 @@ struct signUpView: View {
     
     @EnvironmentObject var authHelper: FireAuthController
     @EnvironmentObject var dbHelper: FirestoreController
+    @EnvironmentObject var storageHelper: FirebaseStorageController
     @Binding var rootScreen: Int
     
     @State private var linkselection: Int? = nil
@@ -26,30 +27,6 @@ struct signUpView: View {
     @State private var photoItem: PhotosPickerItem?
     @State private var iconImage: Image?
     @State private var uiIcon: UIImage?
-    
-    func uploadIcon(){
-        let storageRef = Storage.storage().reference()
-        
-        if let userIcon = uiIcon{
-            let iconI = userIcon.jpegData(compressionQuality: 0.6)
-            //prevent nil
-            guard iconI != nil else{
-                print("cannot convert to jpeg")
-                return
-            }
-            let fileRef = storageRef.child("\(self.email)/\(self.email)_icon.jpg")
-            
-            let uploadT = fileRef.putData(iconI!) { data, error in
-                if data != nil && error == nil{
-                    
-                }else{
-                    print(error)
-                }
-            }
-        }else{
-            print("user doesn't set an icon")
-        }
-    }
     
     var body: some View {
         ZStack{
@@ -165,7 +142,7 @@ struct signUpView: View {
                         self.authHelper.signUp(email: self.email, password: self.password, withCompletion: { isSuccessful, error in
                             if (isSuccessful){
                                 //show to home screen
-                                uploadIcon()
+                                storageHelper.uploadIcon(email: self.email, uiIcon: uiIcon)
                                 let newUser = UserInfo(firstName: self.firstName, lastName: self.lastName, email: self.email, iconUrl: "\(self.email)/\(self.email)_icon.jpg")
                                 dbHelper.insertUser(newUser: newUser)
                                 self.isError = false

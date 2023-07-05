@@ -11,6 +11,7 @@ struct searchFriend: View {
     
     @EnvironmentObject var authHelper: FireAuthController
     @EnvironmentObject var dbHelper: FirestoreController
+    @EnvironmentObject var storageHelper: FirebaseStorageController
     @Binding var rootScreen: Int
     @State private var nameOrEmail: String = ""
     
@@ -19,9 +20,8 @@ struct searchFriend: View {
     var body: some View {
         VStack{
             Text("Search Friend").font(.title)
-            TextField("Search by name", text: self.$nameOrEmail).padding().border(.pink, width: 3).padding().autocapitalization(.none)
+            TextField("Search by name", text: self.$nameOrEmail).padding().border(.pink, width: 3).padding().autocapitalization(.none).autocorrectionDisabled()
                 .onChange(of: nameOrEmail){newValue in
-                    print("name changed \(newValue)")
                     dbHelper.searchFriend(nameOrEmail: self.nameOrEmail)
                 }
                 
@@ -29,7 +29,7 @@ struct searchFriend: View {
                 ForEach(dbHelper.searchList.enumerated().map({$0}), id: \.element.self){
                     index, friend in
                     NavigationLink{
-                        showUserView()
+                        showUserView(rootScreen: $rootScreen, userInfo: friend).environmentObject(authHelper).environmentObject(dbHelper).environmentObject(storageHelper)
                     }label: {
                         Text("\(friend.firstName) \(friend.lastName)")
                         Text(friend.email)
