@@ -15,6 +15,7 @@ class FirebaseStorageController: ObservableObject{
     private var storageRef = Storage.storage().reference()
     
     @Published var userIcon: UIImage? = nil
+    @Published var friendIcon: [String: UIImage?] = [:]
     
     func uploadIcon(email: String, uiIcon: UIImage?){
         
@@ -48,6 +49,22 @@ class FirebaseStorageController: ObservableObject{
             }else{
                 self.userIcon = UIImage(data: data!)
             }
+        }
+    }
+    
+    func downloadFriendIcon(email: String?) {
+        if email != nil{
+            storageRef.child("\(email!)/\(email!)_icon.jpg").getData(maxSize: 5*1024*1024){
+                data, error in
+                if error != nil{
+                    print("\(String(describing: error))")
+                    self.friendIcon[email!] = nil
+                }else{
+                    self.friendIcon[email!] = UIImage(data: data!)
+                }
+            }
+        } else{
+            print("invalid email")
         }
     }
 }

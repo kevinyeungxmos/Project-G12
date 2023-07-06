@@ -121,7 +121,7 @@ struct listOfEventView: View {
     var body: some View {
         VStack{
             HStack{
-                TextField("Search by city", text: self.$city)
+                TextField("Search by city", text: self.$city).padding().textFieldStyle(RoundedBorderTextFieldStyle())
                 
                 Button(action: {
                     isFilter.toggle()

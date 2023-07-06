@@ -282,7 +282,7 @@ class FirestoreController : ObservableObject{
                             
                             do {
                                 let tempList : EventInfo = try docChange.document.data(as: EventInfo.self)
-                                var docId = docChange.document.documentID
+                                let docId = docChange.document.documentID
                                 print("DocumentID: \(docId)   tempList id: \(String(describing: tempList.id))")
                                 
                                 if docChange.type == .added{
@@ -325,6 +325,7 @@ class FirestoreController : ObservableObject{
                 try self.db.collection(COLLECTION).document(self.loggedInUserEmail).collection(FRIEND_LIST)
                     .document(friendEmail).setData(["email":friendEmail])
                 print("friend added")
+                self.getMyFriendList()
             }catch{
                 print("Error addin to frient list: \(error)")
             }

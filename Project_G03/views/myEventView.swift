@@ -25,7 +25,7 @@ struct myEventView: View {
                     ForEach(dbHelper.myEventList.enumerated().map({$0}), id: \.element.self){
                         index, event in
                         NavigationLink{
-                            eventDetailsView(rootScreen: $rootScreen, event: event, addButton: false).environmentObject(authHelper).environmentObject(dbHelper)
+                            eventDetailsView(rootScreen: $rootScreen, event: event).environmentObject(authHelper).environmentObject(dbHelper)
                         }label:{
                             HStack{
                                 Text("\(event.title)")

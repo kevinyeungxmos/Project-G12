@@ -63,17 +63,32 @@ struct showUserView: View {
                 VStack(alignment: .leading){
                     Text("\(userInfo.firstName) \(userInfo.lastName)").font(.system(size: 36, weight: .bold)).foregroundColor(.gray).padding([.bottom])
                     Text("I am attending \(userInfo.eventAttended) events").frame(alignment: .leading).padding([.bottom])
-                    Button{
-                        dbHelper.addToFriendList(friendEmail: userInfo.email)
-                    }label: {
-                        HStack{
-                            Spacer()
-                            Text("Add Friend").font(.system(size: 16, weight: .bold))
-                            Spacer()
-                        }.foregroundColor(.white)
-                            .padding(.vertical)
-                            .background(.blue)
-                            .shadow(radius: 5)
+                    if dbHelper.myFriendList.contains(userInfo){
+                        Button{
+                            dbHelper.deleteFriend(friendToDelete: userInfo)
+                        }label: {
+                            HStack{
+                                Spacer()
+                                Text("Unfriend").font(.system(size: 16, weight: .bold))
+                                Spacer()
+                            }.foregroundColor(.white)
+                                .padding(.vertical)
+                                .background(.blue)
+                                .shadow(radius: 5)
+                        }
+                    }else{
+                        Button{
+                            dbHelper.addToFriendList(friendEmail: userInfo.email)
+                        }label: {
+                            HStack{
+                                Spacer()
+                                Text("Add Friend").font(.system(size: 16, weight: .bold))
+                                Spacer()
+                            }.foregroundColor(.white)
+                                .padding(.vertical)
+                                .background(.blue)
+                                .shadow(radius: 5)
+                        }
                     }
                 }.offset(x:-10)
             }.onAppear{
@@ -87,6 +102,7 @@ struct showUserView: View {
                 for  (index, event) in dbHelper.friendEventList.enumerated(){
                     dbHelper.friendEventList[index].friendAlsoAttend.removeAll()
                 }
+                storageHelper.friendIcon.removeAll()
                 
                 for i in newValue{
 
@@ -103,6 +119,7 @@ struct showUserView: View {
                                 return false
                             }
                             print("shared user: \(a.first?.email)")
+                            storageHelper.downloadFriendIcon(email: a.first?.email)
                             dbHelper.friendEventList[index].friendAlsoAttend.append(a.first!)
                         }
                     }
@@ -121,6 +138,17 @@ struct showUserView: View {
                                     Text("\(event.date)")
                                     Text("\(event.address)")
                                     ForEach(event.friendAlsoAttend, id: \.self){ friend in
+                                        if let img = storageHelper.friendIcon[friend.email]{
+                                            Image(uiImage: img!).resizable()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .clipShape(Circle())
+                                        } else{
+                                            Image("default_icon").resizable()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .clipShape(Circle())
+                                        }
                                         Text("\(friend.firstName) \(friend.lastName) are also attending")
                                     }
                                 }

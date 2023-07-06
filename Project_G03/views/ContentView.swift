@@ -62,16 +62,6 @@ struct ContentView: View {
                     }
                 }
             }
-//            switch root{
-//            case .SignIn:
-//                selectedTabIndex = 0
-//            case .SignUp:
-//                selectedTabIndex = 1
-//            case .ListOfEvent:
-//                selectedTabIndex = 2
-//            case .EventDetails:
-//                selectedTabIndex = 3
-//            }
         }.onAppear(){
             UserDefaults.standard.removeObject(forKey: "KEY_EMAIL")
             print("contentview userdefault: ", UserDefaults.standard.string(forKey: "KEY_EMAIL"))
