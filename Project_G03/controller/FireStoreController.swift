@@ -14,6 +14,7 @@ class FirestoreController : ObservableObject{
     @Published var searchList = [UserInfo]()
     @Published var friendEventList = [EventInfo]()
     @Published var myFriendList = [UserInfo]()
+    @Published var bb : [[String: Int?]] = []
 
     
     private let db : Firestore
@@ -411,8 +412,6 @@ class FirestoreController : ObservableObject{
     func getFriendEvent(email: String) {
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
         friendEventList.removeAll()
-//        myFriendList.removeAll()
-//        self.getMyFriendList()
         
         if (email.isEmpty && self.loggedInUserEmail.isEmpty){
             print("Cannot show user's events, please login")
@@ -435,13 +434,11 @@ class FirestoreController : ObservableObject{
         }
     }
     
-    func getAnothertFriendEvent(email: String) -> [EventInfo] {
+    func getAnothertFriendEvent(email: String) {
         self.loggedInUserEmail = UserDefaults.standard.string(forKey: "KEY_EMAIL") ?? ""
 //        friendEventList.removeAll()
         
-        var returnEvent = [EventInfo]()
-        
-        var bb : [[String: EventInfo?]] = []
+        self.bb.removeAll()
         
         if (email.isEmpty && self.loggedInUserEmail.isEmpty){
             print("Cannot show user's events, please login")
@@ -463,10 +460,10 @@ class FirestoreController : ObservableObject{
                                         let temp = try? doca.data(as: EventInfo.self)
                                         for docf in self.friendEventList{
                                             if temp?.id == docf.id{
-                                                bb.append([em.documentID: temp])
+                                                self.bb.append([em.documentID: temp?.id])
                                             }
                                         }
-                                        print("read another friend event from db successfully \(returnEvent.count)")
+                                        print("read another friend event from db successfully")
                                     }
                                 }
                             }
@@ -476,7 +473,6 @@ class FirestoreController : ObservableObject{
                 }
             }
         }
-        return returnEvent
     }
     
     
