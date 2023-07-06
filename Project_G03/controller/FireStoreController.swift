@@ -96,38 +96,52 @@ class FirestoreController : ObservableObject{
         let docRef = self.db.collection(COLLECTION).document(email)
         docRef.getDocument{
             (document, error) in
+            //check if the user exist
             if let doc = document, doc.exists{
-                
-                //add the event to user event list
                 do{
-                    try self.db
-                        .collection(self.COLLECTION)
-                        .document(email)
-                        .collection(self.USER_EVENT)
-                        .document(String(event.id!))
-                        .setData(from: event)
-                    print("event added")
-                }catch let err as NSError{
-                    print("Unable to add event to user event list \(err)")
-                }
-                
-                // update the amount of event attended by user
-                do{
-                    var userI: UserInfo = try doc.data(as: UserInfo.self)
-                    userI.eventAttended += 1
-                    //update user information
-                    try self.db
-                        .collection(self.COLLECTION)
-                        .document(email)
-                        .updateData(["eventAttended" : userI.eventAttended]){
-                            error in
-                            if let e = error{
-                                print("Unable to update user Information: \(e)")
+                    try self.db.collection(self.COLLECTION).document(email)
+                        .collection(self.USER_EVENT).document(String(event.id!)).getDocument(){
+                            (querySnapshot, err) in
+                            //check if the event exist?
+                            if let d = querySnapshot, d.exists{
+                                print("Event already added")
                             }else{
-                                print("Update successfully")
+                                //not exist
+                                //add the event to user event list
+                                do{
+                                    try self.db
+                                        .collection(self.COLLECTION)
+                                        .document(email)
+                                        .collection(self.USER_EVENT)
+                                        .document(String(event.id!))
+                                        .setData(from: event)
+                                    print("event added")
+                                }catch let err as NSError{
+                                    print("Unable to add event to user event list \(err)")
+                                }
+                                
+                                // update the amount of event attended by user
+                                do{
+                                    var userI: UserInfo = try doc.data(as: UserInfo.self)
+                                    userI.eventAttended += 1
+                                    //update user information
+                                    try self.db
+                                        .collection(self.COLLECTION)
+                                        .document(email)
+                                        .updateData(["eventAttended" : userI.eventAttended]){
+                                            error in
+                                            if let e = error{
+                                                print("Unable to update user Information: \(e)")
+                                            }else{
+                                                print("Update successfully")
+                                            }
+                                        }
+                                    
+                                }catch let err as NSError{
+                                    print(err)
+                                }
                             }
                         }
-                    
                 }catch let err as NSError{
                     print(err)
                 }

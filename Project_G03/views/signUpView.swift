@@ -22,7 +22,8 @@ struct signUpView: View {
     @State private var confirmPassword = ""
     @State private var firstName = ""
     @State private var lastName = ""
-    @State private var isError = false
+    @State private var isAlert = false
+    @State private var signUpSuccess = false
     @State private var errMessage = ""
     @State private var photoItem: PhotosPickerItem?
     @State private var iconImage: Image?
@@ -128,15 +129,14 @@ struct signUpView: View {
                 }.padding(.bottom, 20)
 
                 Button(action: {
-                    print("username: \(self.email)")
-                    print("password: \(self.password)")
-                    print("confirm password: \(self.confirmPassword)")
                     
                     if (self.password != self.confirmPassword){
-                        self.isError = true
-                        self.errMessage = "password confirm Password don't match"
+                        self.isAlert = true
+                        self.signUpSuccess = false
+                        self.errMessage = "Confirm Password not match"
                     }else if (self.email.isEmpty || self.password.isEmpty || self.confirmPassword.isEmpty){
-                        self.isError = true
+                        self.isAlert = true
+                        self.signUpSuccess = false
                         self.errMessage = "email and password cannot be empty"
                     }else{
                         self.authHelper.signUp(email: self.email, password: self.password, withCompletion: { isSuccessful, error in
@@ -145,7 +145,8 @@ struct signUpView: View {
                                 storageHelper.uploadIcon(email: self.email, uiIcon: uiIcon)
                                 let newUser = UserInfo(firstName: self.firstName, lastName: self.lastName, email: self.email, iconUrl: "\(self.email)/\(self.email)_icon.jpg")
                                 dbHelper.insertUser(newUser: newUser)
-                                self.isError = false
+                                self.isAlert = true
+                                self.signUpSuccess = true
                                 self.rootScreen = 2
                                 self.email = ""
                                 self.password = ""
@@ -158,7 +159,8 @@ struct signUpView: View {
                             }else{
                                 //show the alert with invalid username/password prompt
                                 print(#function, "Error: \(error)")
-                                self.isError = true
+                                self.isAlert = true
+                                self.signUpSuccess = false
                                 self.errMessage = error
                             }
                         })
@@ -171,10 +173,17 @@ struct signUpView: View {
                         .frame(width: 100, height: 30)
                         .background(.blue)
                         .cornerRadius(15)
-                }.alert(isPresented: self.$isError){
-                    Alert(title: Text("Error"), message: Text("\(self.errMessage)"), dismissButton: .default(Text("Try Again")){
+                }.alert(isPresented: self.$isAlert){
+                    if self.signUpSuccess{
+                        return Alert(title: Text("Sign Up Success"), dismissButton: .default(Text("OK")){
 
-                    })
+                        })
+                    }else{
+                        return Alert(title: Text("Error"), message: Text("\(self.errMessage)"), dismissButton: .default(Text("Try Again")){
+
+                        })
+                    }
+                
                 }
                 
                 Spacer()

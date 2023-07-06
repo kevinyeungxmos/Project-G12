@@ -56,7 +56,7 @@ struct ContentView: View {
                     }
             }
             .toolbar{
-                if (selectedTabIndex == 2 || selectedTabIndex == 3 || selectedTabIndex == 4){
+                if (selectedTabIndex != 0 && selectedTabIndex != 1 && selectedTabIndex != 3){
                     if let _ = UserDefaults.standard.string(forKey: "KEY_EMAIL"){
                         LogoutView(rootScreen: $selectedTabIndex).environmentObject(authHelper)
                     }
